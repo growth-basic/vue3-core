@@ -1,0 +1,3 @@
+packages:
+  # 所有的项目都是根模块
+  - "packages/*"
