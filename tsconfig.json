@@ -1,18 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es2016", // 目标语法
-    "lib": ["ESNext", "DOM"], // 项目开发支持的类库
-    "jsx": "preserve", // jsx保留 不转义
-    "module": "ESNext", // 模块格式
-    "rootDir": "dist", // 输出的目录                               /* Specify the root folder within your source files. */
-    "moduleResolution": "node", //模块解析模式
-    "resolveJsonModule": true, // 解析JSON模块
+    "outDir": "dist", // 输出的目录
     "sourceMap": true, // 开启sourceMap
-    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
-    // "preserveSymlinks": true,                         /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
-    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
-
-    /* Skip type checking .d.ts files that are included with TypeScript. */
-    "skipLibCheck": true /* Skip type checking all .d.ts files. */
+    "target": "es2016", // 目标语法
+    "module": "ESNext", // 模块格式
+    "moduleResolution": "node", //模块解析模式
+    "strict": false,
+    "resolveJsonModule": true, // 解析JSON模块
+    "esModuleInterop": true, // 允许es6语法引入commonjs模块
+    "jsx": "preserve", // jsx保留 不转义
+    "lib": ["ESNext", "DOM"], // 项目开发支持的类库
+    "baseUrl": ".", // 指定查找的开始路径
+    "paths": {
+      "@vue/*": ["packages/*/src"] // 使用@vue/*选下的任何路径 以packages/*/src下查找
+    }
   }
 }

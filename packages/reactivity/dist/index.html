@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script type="module">
+      import { reactive, effect } from "./reactivity.esm..js";
+      // reactive 创建一个响应式对象
+      const state = reactive({
+        name: "killian",
+        age: 30,
+      });
+      console.log(state);
+      //  effect 副作用函数, 默认会执行一次，数据变化就会执行一次
+      effect(() => {
+        // console.log(state.name);
+        document.title = state.name;
+        console.log(state.age);
+      });
+
+      // setTimeout(() => {
+      //   state.name = "ravindra";
+      // }, 1000);
+    </script>
+  </body>
+</html>
