@@ -1,8 +1,16 @@
 // packages/reactivity/src/effect.ts
 var activeEffect;
+function cleanupEffect(effect2) {
+  let { deps } = effect2;
+  for (let i = 0; i < deps.length; i++) {
+    deps[i].delete(effect2);
+  }
+  effect2.deps.length = 0;
+}
 var ReactiveEffect = class {
-  constructor(fn) {
+  constructor(fn, scheduler) {
     this.fn = fn;
+    this.scheduler = scheduler;
     this.active = true;
     this.deps = [];
     this.parent = void 0;
@@ -14,16 +22,26 @@ var ReactiveEffect = class {
     try {
       this.parent = activeEffect;
       activeEffect = this;
+      cleanupEffect(this);
       return this.fn();
     } finally {
       activeEffect = this.parent;
       this.parent = null;
     }
   }
+  stop() {
+    if (this.active) {
+      cleanupEffect(this);
+      this.active = false;
+    }
+  }
 };
-function effect(fn) {
-  const _effect = new ReactiveEffect(fn);
+function effect(fn, options) {
+  const _effect = new ReactiveEffect(fn, options.scheduler);
   _effect.run();
+  const runner = _effect.run.bind(_effect);
+  runner.effect = _effect;
+  return runner;
 }
 var targetMap = /* @__PURE__ */ new WeakMap();
 function track(target, key) {
@@ -44,30 +62,59 @@ function track(target, key) {
     activeEffect.deps.push(dep);
   }
 }
+function trigger(target, key, newValue, oldValue) {
+  let depsMap = targetMap.get(target);
+  if (!depsMap) {
+    return;
+  }
+  const deps = depsMap.get(key);
+  if (deps) {
+    const effects = [...deps];
+    effects.forEach((effect2) => {
+      if (effect2 !== activeEffect) {
+        if (effect2.scheduler) {
+          effect2.scheduler();
+        } else {
+          effect2.run();
+        }
+      }
+    });
+  }
+}
 
 // packages/shared/src/index.ts
 function isObject(value) {
   return value !== null && typeof value === "object";
 }
 
-// packages/reactivity/src/reactive.ts
-var ReactiveFlags = /* @__PURE__ */ ((ReactiveFlags2) => {
-  ReactiveFlags2["IS_REACTIVE"] = "_v_isReactive";
-  return ReactiveFlags2;
-})(ReactiveFlags || {});
+// packages/reactivity/src/baseHandlers.ts
 var mutableHandlers = {
   get(target, key, receiver) {
     if ("_v_isReactive" /* IS_REACTIVE */ === key) {
       return true;
     }
-    console.log(activeEffect, key);
     track(target, key);
-    return Reflect.get(target, key, receiver);
+    let r = Reflect.get(target, key, receiver);
+    if (isObject(r)) {
+      reactive(r);
+    }
+    return r;
   },
   set(target, key, value, receiver) {
-    return Reflect.set(target, key, value, receiver);
+    let oldValue = target[key];
+    let r = Reflect.set(target, key, value, receiver);
+    if (oldValue !== value) {
+      trigger(target, key, value, oldValue);
+    }
+    return r;
   }
 };
+
+// packages/reactivity/src/reactive.ts
+var ReactiveFlags = /* @__PURE__ */ ((ReactiveFlags2) => {
+  ReactiveFlags2["IS_REACTIVE"] = "_v_isReactive";
+  return ReactiveFlags2;
+})(ReactiveFlags || {});
 var reactiveMap = /* @__PURE__ */ new WeakMap();
 function reactive(target) {
   if (!isObject(target)) {
@@ -88,6 +135,7 @@ export {
   activeEffect,
   effect,
   reactive,
-  track
+  track,
+  trigger
 };
-//# sourceMappingURL=reactivity.esm..js.map
+//# sourceMappingURL=reactivity.esm.js.map

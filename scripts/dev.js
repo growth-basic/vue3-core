@@ -21,7 +21,7 @@ const outputFormat = format.startsWith("global")
 // reactivity.cjs.js
 const outfile = path.resolve(
   __dirname,
-  `../packages/${target}/dist/${target}.${format}..js`
+  `../packages/${target}/dist/${target}.${format}.js`
 );
 
 build({

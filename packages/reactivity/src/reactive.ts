@@ -1,22 +1,9 @@
 import { isObject } from "@vue/shared";
+import { mutableHandlers } from "./baseHandlers";
 import { activeEffect, track } from "./effect";
 export const enum ReactiveFlags {
   IS_REACTIVE = "_v_isReactive",
 }
-// 抽出来，为了后续用于深层次递归
-const mutableHandlers = {
-  get(target, key, receiver) {
-    if (ReactiveFlags.IS_REACTIVE === key) {
-      return true;
-    }
-    console.log(activeEffect, key);
-    track(target, key);
-    return Reflect.get(target, key, receiver);
-  },
-  set(target, key, value, receiver) {
-    return Reflect.set(target, key, value, receiver);
-  },
-};
 
 const reactiveMap = new WeakMap(); // key只能是对象
 export function reactive(target) {
