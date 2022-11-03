@@ -7,7 +7,7 @@ function cleanupEffect(effect) {
   }
   effect.deps.length = 0;
 }
-class ReactiveEffect {
+export class ReactiveEffect {
   public active = true; // effect是否是激活的
   public deps = []; // effect的依赖有哪些
   public parent = undefined;

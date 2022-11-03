@@ -8,20 +8,27 @@
   </head>
   <body>
     <script type="module">
-      import {
-        computed,
-        reactive,
-      } from "/node_modules/@vue/reactivity/dist/reactivity.esm-browser.js";
+      import { computed, reactive } from "./reactivity.esm.js";
       // import {} from "./reactivity.esm.js";
 
       const state = reactive({ name: "killian", age: 30 });
       //  计算属性的目的是会根据状态衍生属性，我们希望这个属性会有缓存功能，如果依赖的数据不变就不会重新计算
-      let aliasName = computed(() => {
-        console.log("默认不执行");
-        return "*" + state.name;
+      // let aliasName = computed(() => {
+      //   console.log("默认不执行");
+      //   return "*" + state.name;
+      // });
+      let aliasName = computed({
+        get() {
+          return "*" + state.name;
+        },
+        set(value) {
+          // aliasName.value = value;
+        },
       });
       // 当我们取值的时候, 会调用此方法
-      aliasName.name;
+      console.log(aliasName.value);
+      state.name = "ravindra"; // 依赖的值发生变化, 会重新执行
+      console.log(aliasName.value);
       // 当依赖的值发生变化后回再次执行
       // 计算属性 内部需要一个斌两，这个变量控制是否需要重新执行dirty, 默认是需要这记性
       // 内部默认dirty, 此时用户取值会执行此方法, 拿到返回结果并缓存起来, 将dirty变为false

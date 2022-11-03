@@ -11,7 +11,7 @@ export const mutableHandlers = {
     track(target, key);
     let r = Reflect.get(target, key, receiver); // 解决对象嵌套的问题
     if (isObject(r)) {
-      // 判断是一个对象的时候 性能比较好, 只有用户在取值的时候, 才进行二次代理
+      // 判断是一个对象的时候 性能比较好, 只有用户在取值的时候, 才进行二次代理, 不用担心性能
       reactive(r); //
     }
     return r;

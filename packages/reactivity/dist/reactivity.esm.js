@@ -86,6 +86,9 @@ function trigger(target, key, newValue, oldValue) {
 function isObject(value) {
   return value !== null && typeof value === "object";
 }
+function isFunction(value) {
+  return typeof value === "function";
+}
 
 // packages/reactivity/src/baseHandlers.ts
 var mutableHandlers = {
@@ -130,9 +133,50 @@ function reactive(target) {
   const proxy = new Proxy(target, mutableHandlers);
   return proxy;
 }
+
+// packages/reactivity/src/computed.ts
+var noop = () => {
+};
+var ComputedRefImpl = class {
+  constructor(getter, setter) {
+    this.setter = setter;
+    this.dep = void 0;
+    this.effect = void 0;
+    this.__v_isRef = true;
+    this._dirty = true;
+    this.effect = new ReactiveEffect(getter, () => {
+      this._dirty = true;
+    });
+  }
+  get value() {
+    if (this._dirty) {
+      this._value = this.effect.run();
+      this._dirty = false;
+    }
+    return this._value;
+  }
+  set value(newValue) {
+    this.setter(newValue);
+  }
+};
+function computed(getterOrOptions) {
+  let onlyGetter = isFunction(getterOrOptions);
+  let getter;
+  let setter;
+  if (onlyGetter) {
+    getter = getterOrOptions;
+    setter = noop;
+  } else {
+    getter = getterOrOptions.get;
+    setter = getterOrOptions.set || noop;
+  }
+  return new ComputedRefImpl(getter, setter);
+}
 export {
+  ReactiveEffect,
   ReactiveFlags,
   activeEffect,
+  computed,
   effect,
   reactive,
   track,
