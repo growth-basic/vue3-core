@@ -35,6 +35,7 @@
           document.title = state.name + state.age;
           console.log(state.n.n);
         },
+        // scheduler调度函数在第一个函数调用之后，进行执行回调
         {
           // 类似watch api的回调, 数据变化了的强制回调实现
           scheduler() {

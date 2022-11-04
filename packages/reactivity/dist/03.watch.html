@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script type="module">
+      import {
+        watch,
+        reactive,
+        effect,
+      } from "/node_modules/vue/dist/vue.esm-browser.js";
+      const state = reactive({
+        name: "killian",
+      });
+
+      // effect(() => state.name, {
+      //   scheduler() {
+      //     console.log("执行此代码");
+      //     console.log(state.name, "scheduler>name");
+      //   },
+      // });
+      //   watch 是监控响应式数据的变化，当响应式数据变化后执行后面的回调
+      watch(
+        () => state,
+        (newValue, oldvalue) => {
+          console.log(newValue, oldvalue);
+        },
+        { deep: true }
+      );
+
+      setTimeout(() => {
+        state.name = "ravindra";
+      }, 2000);
+    </script>
+  </body>
+</html>

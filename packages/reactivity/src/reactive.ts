@@ -5,6 +5,10 @@ export const enum ReactiveFlags {
   IS_REACTIVE = "_v_isReactive",
 }
 
+export function isReactive(target) {
+  return !!(target && target[ReactiveFlags.IS_REACTIVE]);
+}
+
 const reactiveMap = new WeakMap(); // key只能是对象
 export function reactive(target) {
   // 不对非对象的类型进行处理

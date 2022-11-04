@@ -128,3 +128,8 @@ console.log(proxy.aliasName);
 > 当我们取值的时候，会调用此方法， 当依赖的值发生变化的时候会重新计算
 > 计算属性内部需要一个变量, 这个变量控制是否要重新执行`dirty`
 > 内部认识 dirty 是 true 才是用户取值会执行此方法，拿到返回结果并转存起来，将 dirty 变为 false
+
+### watch 属性的实现?
+
+- 计算属性内部还是基于 effect 实现, 通过 dirty 是脏的去执行代码的变化 ?
+  就是一个 effect 的执行，基于 effect 的 scheduler 获取前后的值，进行获取，immediate 记性默认执行一次

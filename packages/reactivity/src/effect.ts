@@ -37,7 +37,7 @@ export class ReactiveEffect {
 }
 // 依赖收集，就是将当前的effect变成全局的，稍后取值的时候可以拿到这个全局正在激活的effect
 export function effect(fn, options: any) {
-  const _effect = new ReactiveEffect(fn, options.scheduler);
+  const _effect = new ReactiveEffect(fn, options?.scheduler);
   _effect.run();
   const runner = _effect.run.bind(_effect); // bind强制指定当前的this指向.
   runner.effect = _effect;
@@ -63,6 +63,10 @@ export function track(target, key) {
   if (!dep) {
     depsMap.set(key, (dep = new Set()));
   }
+  trackEffects(dep);
+}
+
+export function trackEffects(dep) {
   let shouldTrack = !dep.has(activeEffect);
   if (shouldTrack) {
     dep.add(activeEffect); // 属性记住effect
@@ -78,19 +82,22 @@ export function trigger(target, key, newValue, oldValue) {
   if (!depsMap) {
     return;
   }
-  const deps = depsMap.get(key);
-  if (deps) {
-    const effects = [...deps]; // 拷贝一份为了防止set的特性，
-    // 重新设置值的时候会重新出发依赖执行属性依赖的effect函数
-    effects.forEach((effect) => {
-      // 当我重新执行此effect时，会将当前执行的effect放到全局上activeEffect
-      if (effect !== activeEffect) {
-        if (effect.scheduler) {
-          effect.scheduler();
-        } else {
-          effect.run();
-        }
-      }
-    });
+  const dep = depsMap.get(key);
+  if (dep) {
+    triggerEffects(dep);
   }
+}
+export function triggerEffects(dep) {
+  const effects = [...dep]; // 拷贝一份为了防止set的特性，
+  // 重新设置值的时候会重新出发依赖执行属性依赖的effect函数
+  effects.forEach((effect) => {
+    // 当我重新执行此effect时，会将当前执行的effect放到全局上activeEffect
+    if (effect !== activeEffect) {
+      if (effect.scheduler) {
+        effect.scheduler();
+      } else {
+        effect.run();
+      }
+    }
+  });
 }

@@ -37,7 +37,7 @@ var ReactiveEffect = class {
   }
 };
 function effect(fn, options) {
-  const _effect = new ReactiveEffect(fn, options.scheduler);
+  const _effect = new ReactiveEffect(fn, options == null ? void 0 : options.scheduler);
   _effect.run();
   const runner = _effect.run.bind(_effect);
   runner.effect = _effect;
@@ -56,6 +56,9 @@ function track(target, key) {
   if (!dep) {
     depsMap.set(key, dep = /* @__PURE__ */ new Set());
   }
+  trackEffects(dep);
+}
+function trackEffects(dep) {
   let shouldTrack = !dep.has(activeEffect);
   if (shouldTrack) {
     dep.add(activeEffect);
@@ -67,19 +70,22 @@ function trigger(target, key, newValue, oldValue) {
   if (!depsMap) {
     return;
   }
-  const deps = depsMap.get(key);
-  if (deps) {
-    const effects = [...deps];
-    effects.forEach((effect2) => {
-      if (effect2 !== activeEffect) {
-        if (effect2.scheduler) {
-          effect2.scheduler();
-        } else {
-          effect2.run();
-        }
-      }
-    });
+  const dep = depsMap.get(key);
+  if (dep) {
+    triggerEffects(dep);
   }
+}
+function triggerEffects(dep) {
+  const effects = [...dep];
+  effects.forEach((effect2) => {
+    if (effect2 !== activeEffect) {
+      if (effect2.scheduler) {
+        effect2.scheduler();
+      } else {
+        effect2.run();
+      }
+    }
+  });
 }
 
 // packages/shared/src/index.ts
@@ -118,6 +124,9 @@ var ReactiveFlags = /* @__PURE__ */ ((ReactiveFlags2) => {
   ReactiveFlags2["IS_REACTIVE"] = "_v_isReactive";
   return ReactiveFlags2;
 })(ReactiveFlags || {});
+function isReactive(target) {
+  return !!(target && target["_v_isReactive" /* IS_REACTIVE */]);
+}
 var reactiveMap = /* @__PURE__ */ new WeakMap();
 function reactive(target) {
   if (!isObject(target)) {
@@ -146,9 +155,14 @@ var ComputedRefImpl = class {
     this._dirty = true;
     this.effect = new ReactiveEffect(getter, () => {
       this._dirty = true;
+      console.log(this.dep, "dep//");
+      triggerEffects(this.dep);
     });
   }
   get value() {
+    if (activeEffect) {
+      trackEffects(this.dep || (this.dep = /* @__PURE__ */ new Set()));
+    }
     if (this._dirty) {
       this._value = this.effect.run();
       this._dirty = false;
@@ -178,8 +192,11 @@ export {
   activeEffect,
   computed,
   effect,
+  isReactive,
   reactive,
   track,
-  trigger
+  trackEffects,
+  trigger,
+  triggerEffects
 };
 //# sourceMappingURL=reactivity.esm.js.map
