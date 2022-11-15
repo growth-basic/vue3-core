@@ -9,7 +9,7 @@ function cleanupEffect(effect) {
 }
 export class ReactiveEffect {
   public active = true; // effect是否是激活的
-  public deps = []; // effect的依赖有哪些
+  public deps = []; // effect的依赖有哪些  进行收集
   public parent = undefined;
   constructor(public fn, private scheduler) {}
   run() {
@@ -38,7 +38,7 @@ export class ReactiveEffect {
 // 依赖收集，就是将当前的effect变成全局的，稍后取值的时候可以拿到这个全局正在激活的effect
 export function effect(fn, options: any) {
   const _effect = new ReactiveEffect(fn, options?.scheduler);
-  _effect.run();
+  _effect.run(); // 默认让函数执行一次
   const runner = _effect.run.bind(_effect); // bind强制指定当前的this指向.
   runner.effect = _effect;
   return runner;

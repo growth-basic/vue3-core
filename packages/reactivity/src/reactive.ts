@@ -2,7 +2,7 @@ import { isObject } from "@vue/shared";
 import { mutableHandlers } from "./baseHandlers";
 import { activeEffect, track } from "./effect";
 export const enum ReactiveFlags {
-  IS_REACTIVE = "_v_isReactive",
+  IS_REACTIVE = "__v_isReactive",
 }
 
 export function isReactive(target) {

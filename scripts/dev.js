@@ -1,6 +1,5 @@
 const { build } = require("esbuild");
 const path = require("path");
-
 const args = require("minimist")(process.argv.slice(2)); // 解析用户执行命令的参数
 
 const target = args._[0] || "reactivity"; // 打包的模块

@@ -14,6 +14,11 @@ function traverse(source, s = new Set()) {
   }
   return source;
 }
+
+function doWatch () {
+  
+}
+
 export function watch(source, cb, { immediate } = {} as any) {
   let getter;
   if (isReactive(source)) {
