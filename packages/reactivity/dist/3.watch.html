@@ -12,7 +12,7 @@
         watch,
         reactive,
         effect,
-      } from "/node_modules/vue/dist/vue.esm-browser.js";
+      } from "./reactivity.esm.js";
       const state = reactive({
         name: "killian",
       });
@@ -23,13 +23,16 @@
       //     console.log(state.name, "scheduler>name");
       //   },
       // });
-      //   watch 是监控响应式数据的变化，当响应式数据变化后执行后面的回调
+      //   watch 是监控响应式数据的变化，当响应式数据变化后执行后面的回调, 对象是引用类型的，无法区分新的和老的
+      // watch 不属于响应式模块, 属于vue的全局
+      // 常见的有两种, 直接监控某个对象，或者某个属性
+      // watch就是一个effect + 自定义的scheduler
+      // watchEffect就是一个effect
       watch(
-        () => state,
+        () => state.name,
         (newValue, oldvalue) => {
           console.log(newValue, oldvalue);
-        },
-        { deep: true }
+        }
       );
 
       setTimeout(() => {

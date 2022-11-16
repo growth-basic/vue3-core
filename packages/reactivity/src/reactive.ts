@@ -4,7 +4,7 @@ import { activeEffect, track } from "./effect";
 export const enum ReactiveFlags {
   IS_REACTIVE = "__v_isReactive",
 }
-
+// 扩展是否为reactive响应式对象
 export function isReactive(target) {
   return !!(target && target[ReactiveFlags.IS_REACTIVE]);
 }

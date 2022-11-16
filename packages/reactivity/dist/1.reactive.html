@@ -31,17 +31,19 @@
           // state.age = Math.random();
           // console.log(state.age);
           console.log("runner11~~");
-          // state.flag === false ? state.name : state.age;
+         
           document.title = state.name + state.age;
           console.log(state.n.n);
         },
         // scheduler调度函数在第一个函数调用之后，进行执行回调
         {
           // 类似watch api的回调, 数据变化了的强制回调实现
+          // 组件更新, 可以批量实现由于优化
           scheduler() {
             // scheduler 组件提供一个更新函数，后续组件更新都是根据这个来实现的
             // 未实现
             // console.log(this);
+            // 可以控制手动什么时候执行当前的effect
             setTimeout(() => {
               runner();
             }, 1000);

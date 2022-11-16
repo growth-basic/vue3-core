@@ -14,7 +14,8 @@
     const state = reactive({
       name: "ravindra"
     })
-
+    // 默认执行一次， 用到的响应式，收集当前的effect，变化后再执行一次
+    // watchEffect和watch的区别， 底层都是基于effect
     watchEffect(() => {
       document.getElementById('app').innerHTML = state.name
     })

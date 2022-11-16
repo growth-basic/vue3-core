@@ -36,14 +36,17 @@
       // 再次取值则dirty是false,就会拿缓存中的结果
       // 如果依赖发生了变化,会再次更新dirty变为true
 
-      // vue3中计算属性也具备收集依赖的功能
+      // vue3中计算属性也具备收集依赖的功能, 如果有activeEffect 意味着当前属性在计算属性中执行, 需要计算属性收集这个effect
       effect(() => {
         app.innerHTML = aliasName.value;
       });
 
-      setTimeout(() => {
-        state.name = "ravindra";
-      }, 1000);
+      aliasName.value
+
+
+      // setTimeout(() => {
+      //   state.name = "ravindra";
+      // }, 1000);
     </script>
   </body>
 </html>

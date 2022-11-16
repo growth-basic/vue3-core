@@ -36,8 +36,8 @@ var ReactiveEffect = class {
     }
   }
 };
-function effect(fn, options) {
-  const _effect = new ReactiveEffect(fn, options == null ? void 0 : options.scheduler);
+function effect(fn, options = {}) {
+  const _effect = new ReactiveEffect(fn, options.scheduler);
   _effect.run();
   const runner = _effect.run.bind(_effect);
   runner.effect = _effect;
@@ -99,7 +99,7 @@ function isFunction(value) {
 // packages/reactivity/src/baseHandlers.ts
 var mutableHandlers = {
   get(target, key, receiver) {
-    if ("_v_isReactive" /* IS_REACTIVE */ === key) {
+    if ("__v_isReactive" /* IS_REACTIVE */ === key) {
       return true;
     }
     track(target, key);
@@ -121,18 +121,18 @@ var mutableHandlers = {
 
 // packages/reactivity/src/reactive.ts
 var ReactiveFlags = /* @__PURE__ */ ((ReactiveFlags2) => {
-  ReactiveFlags2["IS_REACTIVE"] = "_v_isReactive";
+  ReactiveFlags2["IS_REACTIVE"] = "__v_isReactive";
   return ReactiveFlags2;
 })(ReactiveFlags || {});
 function isReactive(target) {
-  return !!(target && target["_v_isReactive" /* IS_REACTIVE */]);
+  return !!(target && target["__v_isReactive" /* IS_REACTIVE */]);
 }
 var reactiveMap = /* @__PURE__ */ new WeakMap();
 function reactive(target) {
   if (!isObject(target)) {
     return target;
   }
-  if (target["_v_isReactive" /* IS_REACTIVE */]) {
+  if (target["__v_isReactive" /* IS_REACTIVE */]) {
     return target;
   }
   const exisitsProxy = reactiveMap.get(target);
@@ -186,6 +186,50 @@ function computed(getterOrOptions) {
   }
   return new ComputedRefImpl(getter, setter);
 }
+
+// packages/reactivity/src/watch.ts
+function traverse(source, s = /* @__PURE__ */ new Set()) {
+  if (!isObject(source)) {
+    return source;
+  }
+  if (s.has(source)) {
+    return source;
+  }
+  s.add(source);
+  for (const key in source) {
+    traverse(source[key], s);
+  }
+  return source;
+}
+function doWatch(source, cb, { immediate } = {}) {
+  let getter;
+  if (isReactive(source)) {
+    getter = () => traverse(source);
+  } else if (isFunction(source)) {
+    getter = source;
+  }
+  let oldValue;
+  const job = () => {
+    if (cb) {
+      let newValue = effect2.run();
+      cb(newValue, oldValue);
+      oldValue = newValue;
+    } else {
+      effect2.run();
+    }
+  };
+  const effect2 = new ReactiveEffect(getter, job);
+  if (immediate) {
+    return job();
+  }
+  oldValue = effect2.run();
+}
+function watch(source, cb, { immediate } = {}) {
+  doWatch(source, cb, immediate);
+}
+function watchEffect(effect2, options) {
+  doWatch(effect2, null, options);
+}
 export {
   ReactiveEffect,
   ReactiveFlags,
@@ -197,6 +241,8 @@ export {
   track,
   trackEffects,
   trigger,
-  triggerEffects
+  triggerEffects,
+  watch,
+  watchEffect
 };
 //# sourceMappingURL=reactivity.esm.js.map

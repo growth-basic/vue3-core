@@ -109,25 +109,35 @@ console.log(proxy.aliasName);
     > 映射表的设计, 一个对象中属性可能在多个 effect 中使用
 
     ```js
+    const targetMap = new WeakMap()  
+    const deps = new Map()
+
     let effectMapping = {
       target: {
         name: [activeEffect, activeEffect],
       },
     };
     ```
-
+  - 最终是一个属性中关联了多个effect, 一个effect中存在多个属性(多对多之间的关系)
+    
 8.  响应式数据依赖收集的逻辑实现是怎样实现的?
+  > 判断是一个对象的时候， 在进行响应式代理, 性能比较好, 只有用户在取值的时候, 才进行二次代理, 不用担心性能, 而且有缓存
 
 9.  清理 effect 中所有依赖的属性, 因为我们在执行判断逻辑的时候, 当我们更新不必要的属性的时候也会触发 effect 执行, 清除上一次的依赖收集可以避免 effect 重复执行
+    ```js
+        // 因为 我们在设置flag的时候，第一次收集age 第二次收集了 name, 当我们触发修改name的时候， effect已经收集了name， 所以需要再effect执行之前,先清空effect中的deps
+        state.flag === false ? state.name : state.age;
+        // cleanupEffect
+    ```
 10. effect 的返回值 runner 手动执行实现和 stop 函数停止,以及 scheduler 组件更新实现
     > scheduler 组件提供一个更新函数，后续组件更新都是根据这个来实现的
 
-### 计算属性
+### 计算属性-Computed => dirty => ReactiveEffect
 
 > 计算属性的目的是根据状态衍生出一个状态，我们希望这个属性有缓存功能，如果依赖的数据不发生变化不会重新计算
-> 当我们取值的时候，会调用此方法， 当依赖的值发生变化的时候会重新计算
+> 当我们取值的时候，会调用此方法，多次取值会有缓存功能, 当依赖的值发生变化的时候会重新计算
 > 计算属性内部需要一个变量, 这个变量控制是否要重新执行`dirty`
-> 内部认识 dirty 是 true 才是用户取值会执行此方法，拿到返回结果并转存起来，将 dirty 变为 false
+> 内部认识 dirty 是 true 才是用户取值会执行此方法，拿到返回结果并缓存起来，将 dirty 变为 false
 
 ### watch 属性的实现?
 
