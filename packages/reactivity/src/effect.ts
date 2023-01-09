@@ -87,21 +87,22 @@ export function trigger(target, key, newValue, oldValue) {
     return;
   }
   const dep = depsMap.get(key); // 获取对象属性收集的effect
-  if (dep) {
+  
     triggerEffects(dep);
-  }
 }
 export function triggerEffects(dep) {
-  const effects = [...dep]; // 拷贝一份为了防止set的特性，
-  // 重新设置值的时候会重新出发依赖执行属性依赖的effect函数
-  effects.forEach((effect) => {
-    // 当我重新执行此effect时，会将当前执行的effect放到全局上activeEffect
-    if (effect !== activeEffect) { // 避免正在执行的effect,防止死循环
-      if (effect.scheduler) {
-        effect.scheduler();
-      } else {
-        effect.run(); // 当属性设置的时候让所有依赖该属性的effect执行
+  if (dep) {
+    const effects = [...dep]; // 拷贝一份为了防止set的特性，
+    // 重新设置值的时候会重新出发依赖执行属性依赖的effect函数
+    effects.forEach((effect) => {
+      // 当我重新执行此effect时，会将当前执行的effect放到全局上activeEffect
+      if (effect !== activeEffect) { // 避免正在执行的effect,防止死循环
+        if (effect.scheduler) {
+          effect.scheduler();
+        } else {
+          effect.run(); // 当属性设置的时候让所有依赖该属性的effect执行
+        }
       }
-    }
-  });
+    });
+  }
 }

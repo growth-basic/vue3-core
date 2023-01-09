@@ -9,7 +9,7 @@
 <body>
   <div id="app"></div>
   <script type="module">
-    import { watchEffect, reactive } from "/node_modules/vue/dist/vue.esm-browser.js"
+    import { watchEffect, reactive } from "./reactivity.esm.js"
 
     const state = reactive({
       name: "ravindra"
@@ -23,6 +23,7 @@
     setTimeout(() => {
       state.name = "killian"
     }, 1000)
+    console.log(123)
 
   </script>
 </body>

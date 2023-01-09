@@ -27,11 +27,16 @@ function doWatch (source, cb, {immediate}: any = {}) {
     getter = source
   }
   let oldValue;
+  let cleanup;
+  const onCleanup = (userCb) => {
+    cleanup = userCb
+  }
   const job = () => {
     if (cb) { // 存在回调函数,说明是watch
           // 内部要调用cb，也就是watch回调方法
       let newValue = effect.run(); // 执行回调获取新的值
-      cb(newValue, oldValue);
+      if (cleanup) cleanup()
+      cb(newValue, oldValue, onCleanup);
       oldValue = newValue;
     } else { // 说明是watchEffect
       effect.run() // 让effect重新执行， 调用run方法会重新做清理和依赖收集的工作

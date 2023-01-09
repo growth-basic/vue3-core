@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module">
+    // import {watch, reactive} from '/node_modules/vue/dist/vue.esm-browser.js'
+    import {watch, reactive} from "./reactivity.esm.js"
+    const state = reactive({age: 1, name: "killian"})
+  // 当数据变化后，我希望根据最新的数据 获取结果
+  // 第一次： 数据变化了, 我会调用一个接口 getData() 1000ms => 返回一个结果
+  // 第二次： 数据变化了, 我会调用一个接口 getData() 500ms=> 返回一个结果
+
+  // 最终显示的结果是:
+  // 第一次结果速度比较慢，第二次比较快, 但是用第一次结果覆盖掉了第二次的结果
+  let timer = 3000
+  function getData(data) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(data)
+      }, timer -= 1000)
+    })
+  }
+  // vue2中怎样解决这个问题
+  let arr = []
+  watch(() => state.name, async (newValue, oldValue, onCleanup ) => {
+    let flag = true
+    debugger
+    onCleanup(() => {
+      flag = false
+      // 优化代码，清除上一次的数据会被覆盖
+    })
+    // while(arr.length > 0) {
+    //   let cb = arr.shift()
+    //   cb()
+    // }
+    // arr.push(() => {
+    //   flag = false
+    // })
+    let r = await getData(newValue)
+    if (flag) {
+      app.innerHTML = r
+    }
+  })
+  // 清除上一次的结果 cancelToken, 清理第二次的清除结果
+  state.name = 1
+  state.name = 2
+  </script>
+</body>
+</html>

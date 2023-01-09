@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body >
+    <div id="app"></div>
+    <script type="module">
+     import {ref, watchEffect } from "./reactivity.esm.js"
+
+    //  一般情况下 用于处理基本数据类型，还有就是用户换掉整个对象类型
+    // 对象类型 我们一般用reactive来实现
+    const flag = ref(true)
+    setTimeout(() => {
+        flag.value = false
+
+    }, 2000)
+
+    watchEffect(() => {
+        app.innerHTML  = flag.value
+    })
+
+
+
+    </script>
+    
+
+</body>
+</html>

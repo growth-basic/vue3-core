@@ -143,3 +143,5 @@ console.log(proxy.aliasName);
 
 - 计算属性内部还是基于 effect 实现, 通过 dirty 是脏的去执行代码的变化 ?
   就是一个 effect 的执行，基于 effect 的 scheduler 获取前后的值，进行获取，immediate 记性默认执行一次
+
+### watchEffect的实现
