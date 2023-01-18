@@ -15,7 +15,7 @@ export function reactive(target) {
   if (!isObject(target)) {
     return target;
   }
-  // 当targte是代理过的对象的时候，会触发get方法,当get方法中target[ReactiveFlags.IS_REACTIVE]发现这个属性是被调离过的就直接返回
+  // 当target是代理过的对象的时候，会触发get方法,当get方法中target[ReactiveFlags.IS_REACTIVE]发现这个属性是被调离过的就直接返回
   // 能触发get方法的肯定是被代理过的对象
   if (target[ReactiveFlags.IS_REACTIVE]) {
     return target;
@@ -25,7 +25,8 @@ export function reactive(target) {
   if (exisitsProxy) {
     return exisitsProxy;
   }
-  // 设置代理对象，会在原独享上进行获取
+  // 设置代理对象，会在原对象上进行获取
+  // 我通过代理对象获取和设置对象属性的时候，你会获取和设置原对象上属性
   const proxy = new Proxy(target, mutableHandlers);
 
   return proxy;

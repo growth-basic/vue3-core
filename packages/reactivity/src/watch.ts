@@ -17,43 +17,66 @@ function traverse(source, s = new Set()) {
   return source;
 }
 
-function doWatch (source, cb, {immediate}: any = {}) {
+function doWatch(source, cb, { immediate }: any = {}) {
   let getter;
   if (isReactive(source)) {
     // 无论是对象还是函数，最终都会被处理成函数
     getter = () => traverse(source); // effect函数， 直接调用run的时候，会执行此函数，直接返回对象，对象不会进行依赖收集, 只有访问属性的时候才进行依赖收集
     // 默认的effect 在组建中使用 渲染effect 计算属性effect 用户effect
   } else if (isFunction(source)) {
-    getter = source
+    getter = source;
   }
   let oldValue;
   let cleanup;
   const onCleanup = (userCb) => {
-    cleanup = userCb
-  }
+    cleanup = userCb;
+  };
   const job = () => {
-    if (cb) { // 存在回调函数,说明是watch
-          // 内部要调用cb，也就是watch回调方法
+    if (cb) {
+      // 存在回调函数,说明是watch
+      // 内部要调用cb，也就是watch回调方法
       let newValue = effect.run(); // 执行回调获取新的值
-      if (cleanup) cleanup()
+      if (cleanup) cleanup();
       cb(newValue, oldValue, onCleanup);
       oldValue = newValue;
-    } else { // 说明是watchEffect
-      effect.run() // 让effect重新执行， 调用run方法会重新做清理和依赖收集的工作
+    } else {
+      // 说明是watchEffect
+      effect.run(); // 让effect重新执行， 调用run方法会重新做清理和依赖收集的工作
     }
   };
   // 修改了新值，进行重新计算，重新执行回调获取新值
   const effect = new ReactiveEffect(getter, job);
-  if (immediate) { // immediate 默认会执行一次回调
+  if (immediate) {
+    // immediate 默认会执行一次回调
     return job();
   }
   oldValue = effect.run(); // 保留老值
 }
 // watch 就是effect 状态会收集watch effect, 状态发生变化 会触发scheduler
 export function watch(source, cb, { immediate } = {} as any) {
-  doWatch(source, cb, immediate)
+  doWatch(source, cb, immediate);
 }
 
 export function watchEffect(effect, options) {
-  doWatch(effect, null, options)
+  doWatch(effect, null, options);
 }
+
+let obj = {
+  name: "killian",
+  aliasName() {
+    console.log("****" + this.name + "**");
+  },
+};
+let proxy = new Proxy(obj, {
+  get(target, key, receiver) {
+    console.log(key);
+    return Reflect.get(target, key, receiver);
+    // return target[key];
+  },
+  set(target, key, value, receiver) {
+    target[key] = value;
+    return true;
+  },
+});
+
+console.log(proxy.aliasName());
