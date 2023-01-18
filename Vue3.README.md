@@ -13,6 +13,9 @@
 
 ### 2. Vue3 的架构
 
+- pnpm 的使用: pnpm 安装都安装到了.pnpm 包下
+  - 安装 vue 的时候，vue 的依赖的很多包都安装在.pnpm 下，我们希望这些依赖包都安装到 node_modules 下，创建.npmrc 文件添加 `shamefully-hoist=true`
+
 > Monorepo 是管理项目代码的一种方式, 指在一个项目中可以管理多个模块/包, 将模块拆分到 package 目录中，作为一个包来管理. 而且包与包之间可以相互引用
 >
 > 1. 一个仓库可以维护多个包,
@@ -26,7 +29,7 @@
 
 > Vue3 使用 pnpm workspace 来实现 monorepo, pnpm 天生支持 monorepo 的开发模式
 
-1. pnpm 安装的时候模块的时候，如果需要安装的是公共模块的包需要`pnpm install vue -w`, `-w:安装到工作目录下`
+1. pnpm 安装的时候模块的时候，如果需要安装的是公共模块的包需要`pnpm install vue -w`, `-w:安装到工作环境根目录下`
 2. 打包的格式有哪些
 
 - node 中使用的 commonjs cjs
@@ -109,8 +112,8 @@ console.log(proxy.aliasName);
     > 映射表的设计, 一个对象中属性可能在多个 effect 中使用
 
     ```js
-    const targetMap = new WeakMap()  
-    const deps = new Map()
+    const targetMap = new WeakMap();
+    const deps = new Map();
 
     let effectMapping = {
       target: {
@@ -118,16 +121,18 @@ console.log(proxy.aliasName);
       },
     };
     ```
-  - 最终是一个属性中关联了多个effect, 一个effect中存在多个属性(多对多之间的关系)
-    
+
+- 最终是一个属性中关联了多个 effect, 一个 effect 中存在多个属性(多对多之间的关系)
+
 8.  响应式数据依赖收集的逻辑实现是怎样实现的?
-  > 判断是一个对象的时候， 在进行响应式代理, 性能比较好, 只有用户在取值的时候, 才进行二次代理, 不用担心性能, 而且有缓存
+
+    > 判断是一个对象的时候， 在进行响应式代理, 性能比较好, 只有用户在取值的时候, 才进行二次代理, 不用担心性能, 而且有缓存
 
 9.  清理 effect 中所有依赖的属性, 因为我们在执行判断逻辑的时候, 当我们更新不必要的属性的时候也会触发 effect 执行, 清除上一次的依赖收集可以避免 effect 重复执行
     ```js
-        // 因为 我们在设置flag的时候，第一次收集age 第二次收集了 name, 当我们触发修改name的时候， effect已经收集了name， 所以需要再effect执行之前,先清空effect中的deps
-        state.flag === false ? state.name : state.age;
-        // cleanupEffect
+    // 因为 我们在设置flag的时候，第一次收集age 第二次收集了 name, 当我们触发修改name的时候， effect已经收集了name， 所以需要再effect执行之前,先清空effect中的deps
+    state.flag === false ? state.name : state.age;
+    // cleanupEffect
     ```
 10. effect 的返回值 runner 手动执行实现和 stop 函数停止,以及 scheduler 组件更新实现
     > scheduler 组件提供一个更新函数，后续组件更新都是根据这个来实现的
@@ -144,4 +149,6 @@ console.log(proxy.aliasName);
 - 计算属性内部还是基于 effect 实现, 通过 dirty 是脏的去执行代码的变化 ?
   就是一个 effect 的执行，基于 effect 的 scheduler 获取前后的值，进行获取，immediate 记性默认执行一次
 
-### watchEffect的实现
+### watchEffect 的实现
+
+###
