@@ -41,4 +41,3 @@ build({
 }).then(() => {
   console.log("watching~~~");
 });
-console.log(args);

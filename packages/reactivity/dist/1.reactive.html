@@ -23,7 +23,7 @@
         },
       });
       // console.log(state);
-      //  effect 副作用函数, 默认会执行一次，数据变化就会执行一次
+      //  effect 副作用函数, 默认会执行一次，当数据变化就会再次执行一次
       const runner = effect(
         () => {
           // 当前的age虽然是响应式的, 但是effect中并没有使用state.age 所以不会进行依赖收集
@@ -31,7 +31,7 @@
           // state.age = Math.random();
           // console.log(state.age);
           console.log("runner11~~");
-         
+
           document.title = state.name + state.age;
           console.log(state.n.n);
         },

@@ -33,7 +33,7 @@
 2. 打包的格式有哪些
 
 - node 中使用的 commonjs cjs
-- es6 esm-bundler esm-browser
+- es6 esm-bundler(希望把包达到一起,还是达成一个文件) esm-browser()
 - global script iife
 
   ```json
@@ -42,8 +42,8 @@
     "name": "@vue/reactivity",
     "version": "1.0.0",
     "description": "",
-    "module": "dist/reactivity.esm-bundler.js", // 加载包的入口
-    "unpkg": "dist/reactivity.global.js", // 全局导入
+    "module": "dist/reactivity.esm-bundler.js", // 加载包的入口,各浏览器使用的
+    "unpkg": "dist/reactivity.global.js", // 全局导入，给脚本使用的
     "buildOptions": {
       "name": "VueReactivity", // 全局到处名称
       "formats": ["esm-browser", "esm-bundler", "cjs", "global"] // 打包的构建输出格式
